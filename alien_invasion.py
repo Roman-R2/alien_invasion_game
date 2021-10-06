@@ -4,6 +4,7 @@ import pygame
 
 from ship import Ship
 from bullet import Bullet
+from alien import Alien
 from settings import Settings
 
 
@@ -25,18 +26,15 @@ class AlienInvasion:
         self.ship = Ship(self)
         self.bullets = pygame.sprite.Group()
 
+        self.aliens = pygame.sprite.Group()
+        self._create_fleet()
+
     def run_game(self):
         """Запуск основного цикла игры"""
         while True:
             self._check_events()
             self.ship.update()
-            self.bullets.update()
-
-            # Удаление снарядов, вышедших за край экрана
-            for bullet in self.bullets.copy():
-                if bullet.rect.bottom <= 0:
-                    self.bullets.remove(bullet)
-            # print(len(self.bullets))
+            self._update_bullets()
 
             self._update_screen()
 
@@ -70,8 +68,25 @@ class AlienInvasion:
 
     def _fire_bullet(self):
         """Создание нового снаряда и включение его в группу bullets"""
-        new_bullet = Bullet(self)
-        self.bullets.add(new_bullet)
+        if len(self.bullets) < self.settings.bullets_allowed:
+            new_bullet = Bullet(self)
+            self.bullets.add(new_bullet)
+
+    def _update_bullets(self):
+        """Обновляет позицию снарядов и уничтожает старые снаряды"""
+        self.bullets.update()
+
+        # Удаление снарядов, вышедших за край экрана
+        for bullet in self.bullets.copy():
+            if bullet.rect.bottom <= 0:
+                self.bullets.remove(bullet)
+        # print(len(self.bullets))
+
+    def _create_fleet(self):
+        """Создание флота вторжения."""
+        # Создание пришельца.
+        alien = Alien(self)
+        self.aliens.add(alien)
 
     def _update_screen(self):
         # При каждом проходе цикла перерисовывается экран
@@ -79,6 +94,7 @@ class AlienInvasion:
         self.ship.blitme()
         for bullet in self.bullets.sprites():
             bullet.draw_bullet()
+        self.aliens.draw(self.screen)
 
         # Отображение последнего прорисованного экрана
         pygame.display.flip()
