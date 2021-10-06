@@ -1,12 +1,10 @@
 import pygame
 
-from alien_invasion_game.alien_invasion import AlienInvasion
-
 
 class Ship:
     """Класс для управления кораблем."""
 
-    def __init__(self, ai_game: AlienInvasion):
+    def __init__(self, ai_game: pygame):
         """Инициализирует корабль и задает его начальную позицию."""
         self.screen = ai_game.screen
         self.settings = ai_game.settings
@@ -28,9 +26,9 @@ class Ship:
 
     def update(self):
         """Обновляет позицию корабля с учетом флага"""
-        if self.moving_right:
+        if self.moving_right and self.rect.right < self.screen_rect.right:
             self.x += self.settings.ship_speed
-        if self.moving_left:
+        if self.moving_left and self.rect.left > 0:
             self.x -= self.settings.ship_speed
 
         # Обновление атрибута rect на основании self.x
